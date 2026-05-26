@@ -10,6 +10,16 @@ int nivel;
 int mapSize;
 char *mapActual;
 
+void llamarDibujar(){
+    BeginDrawing();
+    ClearBackground(BLACK);
+
+    dibujar_mapa(mapActual, camX, camY, mapSize);
+    dibujarJugador(jugadorX, jugadorY, camX, camY);
+
+    EndDrawing();
+}
+
 void nivel(){
     if(nivel == 1){
         mapActual = &mapa1[0][0];
