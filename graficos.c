@@ -1,7 +1,7 @@
 #include "graficos.h"
 
-#define VIEW_SIZE 20
-#define TILE 32
+#define VIEW_SIZE 20 //Vista de solo 20x20
+#define TILE 32 //Tamaño de casilla en pixeles
 
 Texture2D pared;
 Texture2D camino;
@@ -12,7 +12,7 @@ Texture2D salida;
 Texture2D llave;
 
 //Inicializacion de la parte grafica de raylib
-void inicioGraficos(){
+void iniciarGraficos(){
     InitWindow(VIEW_SIZE * TILE, VIEW_SIZE * TILE, "BitQuest");
     SetTargetFPS(60);
 
@@ -61,8 +61,6 @@ void dibujar_mapa(char *mapActual, int camX, int camY, int mapSize){
                     break;
                 case '.': DrawTexture(camino, j*TILE, i*TILE, WHITE);
                     break;
-                case 'P': DrawTexture(jugador, j*TILE, i*TILE, WHITE);
-                    break;
                 case 'M': DrawTexture(moneda, j*TILE, i*TILE, WHITE);
                     break;
                 case 'K': DrawTexture(llave, j*TILE, i*TILE, WHITE);
@@ -80,7 +78,9 @@ void dibujar_mapa(char *mapActual, int camX, int camY, int mapSize){
 
 //Jugador
 void dibujarJugador(int jugadorX, int jugadorY, int camX, int camY){
-
+    int posX = (jugadorX - camX) * TILE;
+    int posY = (jugadorY - camY) * TILE;
+    DrawTexture(jugador, posX, posY, WHITE);
 }
 
 //Cerrar y limpiar al finalizar el programa

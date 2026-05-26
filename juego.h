@@ -16,6 +16,12 @@ void llamarDibujar();
 void limpiar();
 
 //Identificar en que nivel del juego se encuentra el jugador
-void nivel();
+void cambiarNivel(int);
+
+//Función en ensamblador
+int contarAcumulables(char*, int, char);
+
+//Actualizar caracteres de mapa
+void actualizarMapa(char*, int);
 
 #endif

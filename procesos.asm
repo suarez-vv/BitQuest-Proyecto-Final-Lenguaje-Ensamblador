@@ -1,6 +1,6 @@
 bits 64
 default rel
-global casillas
+global contarAcumulables, actualizarMapa
 section .text
 
 ; en c declaramos asi: int contarCaracteres(char *mapa, int totalCeldas, char objetivo)
@@ -11,28 +11,32 @@ section .text
 ; eax = cantidad encontrada
 
 
-contarCaracteres:
+contarAcumulables:
 
     xor eax, eax          ; contador = 0
 
     cmp rsi, 0
-    jle .fin
+    jle .fin_contarAcum
 
-.loop:
+    .loop:
+        mov r8b, [rdi]        ; leer caracter actual
 
-    mov r8b, [rdi]        ; leer caracter actual
+        cmp r8b, dl           ; comparar con objetivo
+        jne .noCoincide
 
-    cmp r8b, dl           ; comparar con objetivo
-    jne .noCoincide
+        inc eax               ; contador++
 
-    inc eax               ; contador++
+    .noCoincide:
 
-.noCoincide:
+        inc rdi               ; siguiente celda
+        dec rsi               ; totalCeldas--
 
-    inc rdi               ; siguiente celda
-    dec rsi               ; totalCeldas--
+        jnz .loop
 
-    jnz .loop
+    .fin_contarAcum:
+        ret
 
-.fin:
-    ret
+actualizarMapa:
+
+    .fin_actMapa:
+        RET

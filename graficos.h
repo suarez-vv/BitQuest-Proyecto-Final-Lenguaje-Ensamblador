@@ -4,7 +4,7 @@
 #include "raylib.h"
 
 //Inicializacion de la parte grafica de raylib
-void inicioGraficos();
+void iniciarGraficos();
 
 //Mapa
 void dibujar_mapa(char *mapActual, int camX, int camY, int mapSize);
