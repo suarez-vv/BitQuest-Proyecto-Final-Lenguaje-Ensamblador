@@ -28,4 +28,10 @@ bool abrirPuerta(int);
 //Actualizar caracteres de mapa
 void actualizarMapa(char*, int, int);
 
+//Calcular puntaje al finalizar nivel
+int calcularPuntaje(int monedas, int llaves, int pasos);
+
+//Contar celdas disponibles
+int contarCeldasDisp(char *mapa, int totalCeldas);
+
 #endif
