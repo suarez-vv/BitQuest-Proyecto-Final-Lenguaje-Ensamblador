@@ -1,42 +1,86 @@
 bits 64
 default rel
-global contarAcumulables, actualizarMapa
+global contarAcumulables, actualizarMapa, abrirPuerta
 section .text
 
-; en c declaramos asi: int contarAcumulables(char *mapa, int totalCeldas, int posMapa)
-
-; rdi = direccion del mapa
-; rsi = total de celdas
-; rdx = posicion actual en el mapa
-; eax = retorno del identificador de caracter
-
-
 contarAcumulables:
+    ;rdi = mapa
+    ;rsi = posicion siguinete (seleccionada) en el mapa
 
-    xor eax, eax          ; contador = 0
+    test rdi, rdi
+    jz .fin_contarAcum
 
-    cmp rsi, 0
-    jle .fin_contarAcum
+    mov r8b, [rdi+rsi]        ; leer caracter siguiente en el mapa
 
-    .loop:
-        mov r8b, [rdi]        ; leer caracter actual
+    cmp r8b, 'M'          ; comparar con moneda
+    je .moneda
 
-        cmp r8b, dl           ; comparar con objetivo
-        jne .noCoincide
+    cmp r8b, 'K'          ; comparar con llave
+    je .llave
 
-        inc eax               ; contador++
+    cmp r8b, 'D'          ; comparar con puerta
+    je .puerta
 
-    .noCoincide:
+    cmp r8b, 'E'          ; comparar con salida
+    je  .salida
 
-        inc rdi               ; siguiente celda
-        dec rsi               ; totalCeldas--
+    cmp r8b, '#'          ; comparar con pared
+    je  .pared
 
-        jnz .loop
+    jmp .piso
+
+    .moneda:
+        mov eax, 0
+        jmp .fin_contarAcum
+
+    .llave:
+        mov eax, 1
+        jmp .fin_contarAcum
+
+    .puerta:
+        mov eax, 2
+        jmp .fin_contarAcum
+
+    .salida:
+        mov eax, 3
+        jmp .fin_contarAcum
+
+    .pared:
+        mov eax, 4
+        jmp .fin_contarAcum
+    
+    .piso:
+        mov eax, 5
 
     .fin_contarAcum:
         ret
 
 actualizarMapa:
+    ; rdi = mapa
+    ; rsi = posicion actual en el mapa
+    ; rdx = posicion siguiente (seleccionada) en el mapa
+
+    mov r8b, [rdi+rdx]        ; leer caracter siguiente en el mapa (respaldo)
+    mov al, [rdi+rsi]         ;obtener el caracter del personaje (posicion actual en el mapa)
+
+    mov [rdi+rdx], al
+    mov byte ptr [rdi+rsi], '.'
 
     .fin_actMapa:
+        RET
+
+abrirPuerta:
+    ;edi = numero de llaves que tiene el jugador
+    CMP EDI, 1
+    JGE .abrir
+    JMP .no_abrir
+
+    .abrir:
+        MOV EAX, 1
+        JMP .fin_abrir_puerta
+    
+    .no_abrir:
+        MOV EAX, 0
+
+    .fin_abrir_puerta:
         RET

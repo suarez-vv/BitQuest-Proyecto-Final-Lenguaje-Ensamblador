@@ -17,10 +17,10 @@ void llamarDibujar();
 void limpiar();
 
 //Identificar en que nivel del juego se encuentra el jugador
-void cambiarNivel(int);
+void cambiarNivel();
 
 //Función en ensamblador
-int contarAcumulables(char*, int, int);
+int contarAcumulables(char*, int);
 
 //Veirificar si se puede abrir una puerta en el mapa
 bool abrirPuerta(int);
