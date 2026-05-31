@@ -28,7 +28,7 @@ fi
 
 #Enlace entre archivos C y ASM
 if gcc main.o juego.o graficos.o procesos.o -o "BitQuest" -lraylib -lGL -lm -lpthread -ldl -lrt -lX11; then
-    echo "Enlace entre archivosy creación de ejecutable, correcto."
+    echo "Enlace entre archivos y creación de ejecutable, correcto."
     echo ""
 else
     echo ""

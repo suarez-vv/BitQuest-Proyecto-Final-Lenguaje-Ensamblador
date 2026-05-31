@@ -9,7 +9,7 @@ void iniciarJuego();
 void estadoJuego();
 
 //Llamar la parte gráfica de raylib
-void llamarDibujar();
+void llamarDibujar(bool *status);
 
 //Limpiar al finalizar
 void limpiar();
@@ -24,7 +24,7 @@ int contarCaracter(char*, int, char);
 int validarMovimiento(char*, int, int, int); //(Se puede usar en lugar de actualizarMapa)
 
 //Calcular puntaje al finalizar el juego (Funcion olbigatoria 3)
-int calcularPuntaje(int, int, int);
+int calcularPuntaje(int, int, int, int);
 
 //Detectar si hay cierto objeto en el mapa (Funcion olbigatoria 4)
 int detectarObjeto(char*, int, int, int, char); //contarAcumulables (Se puede usar en lugar de abrirPuerta)

@@ -27,9 +27,9 @@ int pasosNivel = 0; //Pasos realizados durante un nivel
 int monedasAcum = 0; //Monedas acumuladas durante todo el juego
 int llavesAcum = 0; //Llaves acumuladas durante todo el juego
 int pasosAcum = 0; //Pasos realizados durante todo el juego
-int nivelesComp = -1; //Cantidad de niveles completados
+int nivelesComp = 0; //Cantidad de niveles completados
 int puntajeFinal = 0; //Puntaje final del juego
-int estado = 1; //1=Jugando un nivel, 2=Pasando de nivel, 3=Final del juego
+int estado = 1; //1=Jugando un nivel, 2=Pasando de nivel, 3=Fin del juego
 
 void iniciarJuego(){
     cambiarNivel();
@@ -40,7 +40,8 @@ void estadoJuego(){
     //Si acabamos el nivel se ve la pantalla de fin de este, cambiamos de nivel
     if(estado == 2){
         if(IsKeyPressed(KEY_ENTER)){
-            if(nivelesComp == 3){ //Agregar que si se presiona 'Q' tambien se acabe el juego
+
+            if(nivelesComp == 3){ //Ya se completaron los 3 niveles entonces es el fin del juego
                 estado = 3;
             }else{
                 estado = 1;
@@ -56,7 +57,6 @@ void estadoJuego(){
         llaves_Nivel = contarCaracter(mapActual, (mapSize*mapSize), 'K');
         iniciandoNivel = false;
     }
-    
 
     int destinoX = jugadorX;
     int destinoY = jugadorY;
@@ -66,7 +66,7 @@ void estadoJuego(){
     if(IsKeyPressed(KEY_A)) destinoX--; //Izquierda
     if(IsKeyPressed(KEY_S)) destinoY++; //Abajo
     if(IsKeyPressed(KEY_D)) destinoX++; //Derecha
-    if(IsKeyPressed(KEY_Q)){
+    if(IsKeyPressed(KEY_Q)){ //Salir del juego
         estado = 3;
         return;
     }
@@ -85,10 +85,17 @@ void estadoJuego(){
                 if(llavesObtNivel < 1) actualiMapa = false; //Si no tiene una llave para abrir la puerta entonces no habra movimiento y el mapa no se actualizará
                 else llavesUtilNivel--; //Si tiene una llave para abrir la puerta entonces se consume la llave y se actualiza el mapa con el movimiento
             }else if(detectarObjeto(mapActual, mapSize, destinoY, destinoX, 'E')){ //Si es una salida
+                nivelesComp++;
+                totalMonedas += monedas_Nivel;
+                totalLlaves += llaves_Nivel;
+                monedasAcum += monedasObtNivel;
+                llavesAcum += llavesObtNivel;
+                pasosAcum += pasosNivel;
+
                 estado = 2;
                 return;
             }else if(detectarObjeto(mapActual, mapSize, destinoY, destinoX, '.')){ // Si es piso
-                pasosNivel++;
+                //El mapa se actualiza y los pasos se aumentan abajo al actualizar el mapa
             }else{
                 TraceLog(LOG_WARNING, "Casilla desconocida, informar de revisión para el mapa");
             }
@@ -97,9 +104,10 @@ void estadoJuego(){
         }
 
         //Sí se realizo un movimiento valido y hay que actualizar el mapa, sino no se movera y no hay que atcualizar mapa
-        if(actualiMapa){
+        if(actualiMapa && (jugadorY != destinoY || jugadorX != destinoX)){
             actualizarMapa(mapActual, mapSize, jugadorY, jugadorX, destinoY, destinoX);
 
+            pasosNivel++;
             jugadorX = destinoX;
             jugadorY = destinoY;
         }
@@ -117,51 +125,51 @@ void estadoJuego(){
     if(camY > mapSize - VIEW) camY = mapSize - VIEW;
 }
 
-void llamarDibujar(){
+void llamarDibujar(bool *status){
     BeginDrawing();
     ClearBackground((Color){55.6f, 51.3f, 47.4f, 255.0f});
 
     if(estado == 1){
+        DrawRectangle(0, 0, 640, 80, BLACK);
+        DrawLine(0, 80, 640, 80, BLACK);
         dibujar_mapa(mapActual, camX, camY, mapSize);
         dibujarJugador(jugadorX, jugadorY, camX, camY);
 
-        DrawText(TextFormat("Nivel: %d", nivel), 10, 10, 20, WHITE);
-        DrawText(TextFormat("Monedas: %d", monedasObtNivel), 10, 30, 20, GOLD);
-        DrawText(TextFormat("Llaves: %d", llavesUtilNivel), 10, 50, 20, WHITE);
+        DrawText(TextFormat("Nivel: %d", nivel), 80, 10, 22, WHITE);
+        DrawText(TextFormat("Monedas: %d", monedasObtNivel), 180, 10, 22, GOLD);
+        DrawText(TextFormat("Llaves: %d", llavesUtilNivel), 340, 10, 22, WHITE);
+        DrawText(TextFormat("Pasos: %d", pasosNivel), 470, 10, 22, WHITE);
+        DrawText("W: Arriba, S: Abajo, A: Izquierda, D: Derecha, Q: Salir", 120, 45, 17, LIGHTGRAY);
     }else if(estado == 2){
+        ClearBackground(BLACK);
         DrawText("FELICIDADES!!!", 200, 150, 40, YELLOW);
         DrawText(TextFormat("NIVEL %d COMPLETADO", nivel), 120, 220, 20, WHITE);
-        
-        switch(nivel){
-            case 1:
-                DrawText(TextFormat("MONEDAS: %d/%d", monedasObtNivel, monedas_Nivel), 200, 280, 20, WHITE);
-                DrawText(TextFormat("LLAVES: %d/%d", llavesObtNivel, llaves_Nivel), 200, 320, 20, WHITE);
-                DrawText("Presiona ENTER para ir al siguiente nivel", 120, 400, 20, WHITE);
-                break;
-            case 2:
-                DrawText(TextFormat("MONEDAS: %d/%d", monedasObtNivel, monedas_Nivel), 200, 280, 20, WHITE);
-                DrawText(TextFormat("LLAVES: %d/%d", llavesObtNivel, llaves_Nivel), 200, 320, 20, WHITE);
-                DrawText("Presiona ENTER para ir al siguiente nivel", 120, 400, 20, WHITE);
-                break;
-            case 3: //Aqui agregar logica para terminarel juego
-                DrawText(TextFormat("MONEDAS: %d/%d", monedasObtNivel, monedas_Nivel), 200, 280, 20, WHITE);
-                DrawText(TextFormat("LLAVES: %d/%d", llavesObtNivel, llaves_Nivel), 200, 320, 20, WHITE);
-                break;
-            default: TraceLog(LOG_WARNING, "Error en el número de nivel");
-                break;
+        DrawText(TextFormat("MONEDAS: %d/%d", monedasObtNivel, monedas_Nivel), 200, 280, 20, WHITE);
+        DrawText(TextFormat("LLAVES: %d/%d", llavesObtNivel, llaves_Nivel), 200, 320, 20, WHITE);
+        DrawText(TextFormat("PASOS: %d", pasosNivel), 200, 360, 20, WHITE);
+        if(nivel < 3){
+            DrawText("Presiona 'ENTER' para ir al siguiente nivel", 120, 440, 20, WHITE);
+        }else {
+            DrawText("Presiona 'ENTER' para ver tu puntaje final", 120, 440, 20, WHITE);
         }
     }else if(estado == 3){
-        puntajeFinal = calcularPuntaje(monedasAcum, pasosAcum, nivelesComp);
-        DrawText("GAME OVER", 150, 280, 40, YELLOW);
-        DrawText("GRACIAS POR JUGAR", 80, 260, 40, GOLD);
-        DrawText(TextFormat("Monedas totales recolectadas: %d/%d", monedasAcum, totalMonedas), 200, 240, 30, WHITE);
-        DrawText(TextFormat("Pasos totales: %d", pasosAcum), 200, 220, 30, WHITE);
-        DrawText(TextFormat("Niveles completados: %d", nivelesComp), 200, 200, 30, WHITE);
-        DrawText(TextFormat("Puntaje final: %d", puntajeFinal), 200, 180, 30, WHITE);
+        static bool continuar = false;
+        ClearBackground(BLACK);
+        puntajeFinal = calcularPuntaje(monedasAcum, llavesAcum, pasosAcum, nivelesComp);
+        DrawText("GAME OVER", 200, 120, 40, YELLOW);
+        DrawText("GRACIAS POR JUGAR", 100, 400, 40, GOLD);
+        DrawText(TextFormat("Monedas totales recolectadas: %d/%d", monedasAcum, totalMonedas), 50, 200, 30, WHITE);
+        DrawText(TextFormat("Pasos totales: %d", pasosAcum), 190, 240, 30, WHITE);
+        DrawText(TextFormat("Niveles completados: %d", nivelesComp), 150, 280, 30, WHITE);
+        DrawText(TextFormat("Puntaje final: %d", puntajeFinal), 190, 320, 30, WHITE);
+        DrawText(TextFormat("Presiona 'Enter' para salir..."), 170, 450, 20, DARKGRAY);
+        if(IsKeyReleased(KEY_ENTER)){
+            continuar = true;
+        }
+        if(continuar && IsKeyPressed(KEY_ENTER)){
+            *status = false;
+        }
     }
-    
-
-    
     EndDrawing();
 }
 
@@ -170,13 +178,6 @@ void limpiar(){
 }
 
 void cambiarNivel(){
-    //Iniciar-reiniciar variables del juego
-    nivelesComp++;
-    totalMonedas += monedas_Nivel;
-    totalLlaves += llaves_Nivel;
-    monedasAcum += monedasObtNivel;
-    llavesAcum += llavesObtNivel;
-    pasosAcum += pasosNivel;
     iniciandoNivel = true;
     camX = 0;
     camY=0;
@@ -185,6 +186,10 @@ void cambiarNivel(){
     monedasObtNivel = 0;
     pasosNivel = 0;
     llavesObtNivel = 0;
+
+    if(nivel == 3){ //Al acabar el nivel 3 se acaba el juego
+        return;
+    }
 
     nivel++;
     if(nivel == 1){
@@ -214,7 +219,7 @@ int contarCaracter(char *mapa, int mapSize, char buscado);
 int validarMovimiento(char *mapa, int mapSize, int newColumna, int newFila); //(Se puede usar en lugar de actualizarMapa)
 
 //Calcular puntaje al finalizar nivel (Funcion olbigatoria 3)
-int calcularPuntaje(int totalMonedasAcum, int cantPasos, int nivelComp);
+int calcularPuntaje(int totalMonedasAcum, int llavesAcum, int cantPasos, int nivelComp);
 
 //Detectar si hay cierto objeto en el mapa (Funcion olbigatoria 4)
 int detectarObjeto(char *mapa, int mapSize, int columnaRev, int filaRev, char buscado); //contarAcumulables (Se puede usar en lugar de abrirPuerta)

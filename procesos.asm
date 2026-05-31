@@ -66,8 +66,9 @@ validarMovimiento:
 ;--------------- CALCULAR PUNTAJE FINAL --------------------
 calcularPuntaje:
     ; edi = monedas
-    ; esi = pasos (llaves esta en duda)
-    ; edx = numero de niveles completados
+    ; esi = llaves
+    ; edx = pasos (llaves esta en duda)
+    ; ecx = numero de niveles completados
 
     ;monedas * 100 (por decidir)
     mov eax, edi

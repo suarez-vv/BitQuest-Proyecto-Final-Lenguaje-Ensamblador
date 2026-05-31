@@ -2,6 +2,7 @@
 
 #define VIEW_SIZE 20 //Vista de solo 20x20
 #define TILE 32 //Tamaño de casilla en pixeles
+#define PANEL_INFO 80 //Tamaño del panel de informacion en pixeles
 
 Texture2D pared;
 Texture2D camino;
@@ -13,7 +14,7 @@ Texture2D llave;
 
 //Inicializacion de la parte grafica de raylib
 void iniciarGraficos(){
-    InitWindow(VIEW_SIZE * TILE, VIEW_SIZE * TILE, "BitQuest");
+    InitWindow(VIEW_SIZE * TILE, VIEW_SIZE * TILE + PANEL_INFO, "BitQuest");
     SetTargetFPS(60);
 
     //Poner las imagenes de las texturas de cada objet
@@ -23,7 +24,7 @@ void iniciarGraficos(){
     moneda = LoadTexture("Moneda.png");
     jugador = LoadTexture("Jugador.png");
     salida = LoadTexture("Salida.png");
-    llave = LoadTexture("LLave.png");
+    llave = LoadTexture("Llave.png");
 
     //Suavizar las orillas de las texturas
     SetTextureFilter(pared, TEXTURE_FILTER_POINT);
@@ -78,7 +79,7 @@ void dibujar_mapa(char *mapActual, int camX, int camY, int mapSize){
                     DrawTexturePro(pared, 
                         (Rectangle){500.0f, 500.0f, (float)pared.width - 1000.0f,
                         (float)pared.height - 1000.0f}, //Imagen completa
-                        (Rectangle){(float)(j*TILE), (float)(i*TILE), (float)(TILE+1), (float)(TILE+1)}, //Imagen escalada
+                        (Rectangle){(float)(j*TILE), (float)(i*TILE + PANEL_INFO), (float)(TILE+1), (float)(TILE+1)}, //Imagen escalada
                         (Vector2){0,0},
                         0.0f,
                         WHITE
@@ -88,7 +89,7 @@ void dibujar_mapa(char *mapActual, int camX, int camY, int mapSize){
                     DrawTexturePro(camino, 
                         (Rectangle){500.0f, 500.0f, (float)camino.width - 1000.0f,
                         (float)camino.height-1000.0f}, //Origen (imagen completa)
-                        (Rectangle){(float)(j*TILE), (float)(i*TILE), (float)(TILE+1), (float)(TILE+1)}, //destino escalado
+                        (Rectangle){(float)(j*TILE), (float)(i*TILE + PANEL_INFO), (float)(TILE+1), (float)(TILE+1)}, //destino escalado
                         (Vector2){0,0},
                         0.0f,
                         WHITE
@@ -98,7 +99,7 @@ void dibujar_mapa(char *mapActual, int camX, int camY, int mapSize){
                     DrawTexturePro(moneda, 
                         (Rectangle){25.0f, 40.0f, (float)moneda.width - 50.0f,
                         (float)moneda.height - 80.0f}, //Origen (imagen completa)
-                        (Rectangle){(float)(j*TILE), (float)(i*TILE), (float)(TILE+1), (float)(TILE+1)}, //destino escalado
+                        (Rectangle){(float)(j*TILE), (float)(i*TILE + PANEL_INFO), (float)(TILE+1), (float)(TILE+1)}, //destino escalado
                         (Vector2){0,0},
                         0.0f,
                         WHITE
@@ -108,7 +109,7 @@ void dibujar_mapa(char *mapActual, int camX, int camY, int mapSize){
                     DrawTexturePro(llave, 
                         (Rectangle){2.0f, 6.0f, (float)llave.width - 4.0f,
                         (float)llave.height - 12.0f}, //Origen (imagen completa)
-                        (Rectangle){(float)(j*TILE), (float)(i*TILE), (float)(TILE+1), (float)(TILE+1)}, //destino escalado
+                        (Rectangle){(float)(j*TILE), (float)(i*TILE + PANEL_INFO), (float)(TILE+1), (float)(TILE+1)}, //destino escalado
                         (Vector2){0,0},
                         0.0f,
                         WHITE
@@ -118,7 +119,7 @@ void dibujar_mapa(char *mapActual, int camX, int camY, int mapSize){
                     DrawTexturePro(puerta, 
                         (Rectangle){390.0f, 50.0f, (float)puerta.width - 780.0f,
                         (float)puerta.height - 100.0f}, //Origen (imagen completa)
-                        (Rectangle){(float)(j*TILE), (float)(i*TILE), (float)(TILE+1), (float)(TILE+1)}, //destino escalado
+                        (Rectangle){(float)(j*TILE), (float)(i*TILE + PANEL_INFO), (float)(TILE+1), (float)(TILE+1)}, //destino escalado
                         (Vector2){0,0},
                         0.0f,
                         WHITE
@@ -128,7 +129,7 @@ void dibujar_mapa(char *mapActual, int camX, int camY, int mapSize){
                     DrawTexturePro(salida, 
                         (Rectangle){170.0f, 50.0f, (float)salida.width - 340.0f,
                         (float)salida.height - 100.0f}, //Origen (imagen completa)
-                        (Rectangle){(float)(j*TILE), (float)(i*TILE), (float)(TILE+1), (float)(TILE+1)}, //destino escalado
+                        (Rectangle){(float)(j*TILE), (float)(i*TILE + PANEL_INFO), (float)(TILE+1), (float)(TILE+1)}, //destino escalado
                         (Vector2){0,0},
                         0.0f,
                         WHITE
@@ -144,7 +145,7 @@ void dibujar_mapa(char *mapActual, int camX, int camY, int mapSize){
 //Jugador
 void dibujarJugador(int jugadorX, int jugadorY, int camX, int camY){
     int posX = (jugadorX - camX) * TILE;
-    int posY = (jugadorY - camY) * TILE;
+    int posY = (jugadorY - camY) * TILE + PANEL_INFO;
     DrawTexturePro(jugador,
         (Rectangle){30.f, 50.0f, (float)jugador.width - 60.f,
         (float)jugador.height - 100.0f},
