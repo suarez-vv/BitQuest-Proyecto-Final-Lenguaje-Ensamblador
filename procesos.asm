@@ -66,8 +66,6 @@ validarMovimiento:
 ;--------------- CALCULAR PUNTAJE FINAL --------------------
 
 
-    global calcularPuntaje
-
 calcularPuntaje:
     ; edi = monedas recolectadas
     ; esi = llaves recolectadas
