@@ -12,6 +12,9 @@ void dibujar_mapa(char *mapActual, int camX, int camY, int mapSize);
 //Jugador
 void dibujarJugador(int jugadorX, int jugadorY, int camX, int camY);
 
+//Actualizar la música del fondo del juego
+void actualizarMusica();
+
 //Cerrar y limpiar al finalizar el programa
 void finGraficos();
 

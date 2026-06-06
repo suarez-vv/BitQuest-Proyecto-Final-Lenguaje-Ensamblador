@@ -17,6 +17,9 @@ void limpiar();
 //Identificar en que nivel del juego se encuentra el jugador
 void cambiarNivel();
 
+//Cargar un mapa desde un archivo de texto externo
+char *cargarMapa(const char *nombreArchivo, int mapSize);
+
 //Contar un caracter especifico del mapa (Funcion obligatoria 1)
 int contarCaracter(char*, int, char);
 

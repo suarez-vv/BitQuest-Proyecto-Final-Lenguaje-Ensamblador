@@ -11,11 +11,18 @@ Texture2D moneda;
 Texture2D jugador;
 Texture2D salida;
 Texture2D llave;
+Music musicaFondo;
 
 //Inicializacion de la parte grafica de raylib
 void iniciarGraficos(){
     InitWindow(VIEW_SIZE * TILE, VIEW_SIZE * TILE + PANEL_INFO, "BitQuest");
-    SetTargetFPS(60);
+    SetTargetFPS(120);
+
+    InitAudioDevice();
+    musicaFondo = LoadMusicStream("musicaFondo.mp3");
+    if(musicaFondo.stream.buffer == 0) TraceLog(LOG_WARNING, "La música del fondo no se cargó correctamente");
+    PlayMusicStream(musicaFondo);
+    SetMusicVolume(musicaFondo, 0.5f);
 
     //Poner las imagenes de las texturas de cada objet
     pared = LoadTexture("Pared.png");
@@ -135,6 +142,9 @@ void dibujar_mapa(char *mapActual, int camX, int camY, int mapSize){
                         WHITE
                     );
                     break;
+                case 'P':
+                     //El jugador se dibuja aparte para que siempre quede encima de los objetos del mapa
+                    break;
                 default: TraceLog(LOG_WARNING, "Elemento no conocido");
                     break;
             }
@@ -154,6 +164,11 @@ void dibujarJugador(int jugadorX, int jugadorY, int camX, int camY){
         (Vector2){0,0}, 0.0f, WHITE);
 }
 
+//Actualizar la música del fondo del juego
+void actualizarMusica(){
+    UpdateMusicStream(musicaFondo);
+}
+
 //Cerrar y limpiar al finalizar el programa
 void finGraficos(){
     //Quitar todas las texturas cargadas
@@ -163,5 +178,7 @@ void finGraficos(){
     UnloadTexture(moneda);
     UnloadTexture(jugador);
     UnloadTexture(salida);
+    UnloadMusicStream(musicaFondo);
+    CloseAudioDevice();
     CloseWindow();
 }

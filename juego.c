@@ -31,6 +31,10 @@ int nivelesComp = 0; //Cantidad de niveles completados
 int puntajeFinal = 0; //Puntaje final del juego
 int estado = 1; //1=Jugando un nivel, 2=Pasando de nivel, 3=Fin del juego
 
+//Variables para al presionar la tecla se siga moviendo
+float tiempoMovimiento = 0.0f;
+float retrasoMovimiento = 0.20f;
+
 void iniciarJuego(){
     cambiarNivel();
     iniciarGraficos();
@@ -41,7 +45,7 @@ void estadoJuego(){
     if(estado == 2){
         if(IsKeyPressed(KEY_ENTER)){
 
-            if(nivelesComp == 3){ //Ya se completaron los 3 niveles entonces es el fin del juego
+            if(nivelesComp == 4){ //Ya se completaron los 4 niveles entonces es el fin del juego
                 estado = 3;
             }else{
                 estado = 1;
@@ -50,6 +54,8 @@ void estadoJuego(){
         }
         return;
     }
+
+    tiempoMovimiento += GetFrameTime();
 
     if(iniciandoNivel){
         celdasLibres = contarCeldasLibres(mapActual, (mapSize*mapSize));
@@ -60,15 +66,43 @@ void estadoJuego(){
 
     int destinoX = jugadorX;
     int destinoY = jugadorY;
+    bool mover = false;
 
     //Movimiento con wasd y salida con q
-    if(IsKeyPressed(KEY_W)) destinoY--; //Hacia arriba
-    if(IsKeyPressed(KEY_A)) destinoX--; //Izquierda
-    if(IsKeyPressed(KEY_S)) destinoY++; //Abajo
-    if(IsKeyPressed(KEY_D)) destinoX++; //Derecha
-    if(IsKeyPressed(KEY_Q)){ //Salir del juego
+    if(IsKeyPressed(KEY_W)){ //Hacia arriba
+        destinoY--;  
+        mover = true;
+        tiempoMovimiento = 0.0f; //Reiniciar el tiempo de movimiento para que al mantener presionada la tecla se siga moviendo cada cierto tiempo
+    }
+    else if(IsKeyPressed(KEY_A)){//Izquierda
+        destinoX--; 
+        mover = true; 
+        tiempoMovimiento = 0.0f; 
+    }
+    else if(IsKeyPressed(KEY_S)){ //Abajo
+        destinoY++; 
+        mover = true; 
+        tiempoMovimiento = 0.0f;
+    } 
+    else if(IsKeyPressed(KEY_D)){ //Derecha
+        destinoX++; 
+        mover = true; 
+        tiempoMovimiento = 0.0f;
+    } 
+    else if(IsKeyPressed(KEY_Q)){ //Salir del juego
+        totalMonedas += monedas_Nivel;
         estado = 3;
         return;
+        }
+    else if(tiempoMovimiento >= retrasoMovimiento){
+        if(IsKeyDown(KEY_W)){ destinoY--; mover = true; }//Hacia arriba
+        else if(IsKeyDown(KEY_A)){ destinoX--; mover = true; }//Izquierda
+        else if(IsKeyDown(KEY_S)){ destinoY++; mover = true; } //Abajo
+        else if(IsKeyDown(KEY_D)){ destinoX++; mover = true; } //Derecha
+
+        if(mover){
+            tiempoMovimiento -= retrasoMovimiento;
+        }
     }
 
     //Comprobar que la casilla propuesta este dentro del mapa
@@ -78,9 +112,11 @@ void estadoJuego(){
             actualiMapa = true;
             if(detectarObjeto(mapActual, mapSize, destinoY, destinoX, 'M')){ //Si es una moneda
                 monedasObtNivel++;
+                monedasAcum++;
             }else if(detectarObjeto(mapActual, mapSize, destinoY, destinoX, 'K')){ //Si es una llave
                 llavesObtNivel++;
                 llavesUtilNivel++;
+                llavesAcum++;
             }else if(detectarObjeto(mapActual, mapSize, destinoY, destinoX, 'D')){ //Si es una puerta
                 if(llavesUtilNivel < 1) actualiMapa = false; //Si no tiene una llave para abrir la puerta entonces no habra movimiento y el mapa no se actualizará
                 else llavesUtilNivel--; //Si tiene una llave para abrir la puerta entonces se consume la llave y se actualiza el mapa con el movimiento
@@ -88,14 +124,13 @@ void estadoJuego(){
                 nivelesComp++;
                 totalMonedas += monedas_Nivel;
                 totalLlaves += llaves_Nivel;
-                monedasAcum += monedasObtNivel;
-                llavesAcum += llavesObtNivel;
-                pasosAcum += pasosNivel;
 
                 estado = 2;
                 return;
             }else if(detectarObjeto(mapActual, mapSize, destinoY, destinoX, '.')){ // Si es piso
                 //El mapa se actualiza y los pasos se aumentan abajo al actualizar el mapa
+            }else if(detectarObjeto(mapActual, mapSize, destinoY, destinoX, 'P')){ //Si es una pared
+                //Solo para cubrir que al detectar la 'P' del personaje no entre en el warning
             }else{
                 TraceLog(LOG_WARNING, "Casilla desconocida, informar de revisión para el mapa");
             }
@@ -108,6 +143,7 @@ void estadoJuego(){
             actualizarMapa(mapActual, mapSize, jugadorY, jugadorX, destinoY, destinoX);
 
             pasosNivel++;
+            pasosAcum++;
             jugadorX = destinoX;
             jugadorY = destinoY;
         }
@@ -127,6 +163,7 @@ void estadoJuego(){
 
 void llamarDibujar(bool *status){
     BeginDrawing();
+    actualizarMusica();
     ClearBackground((Color){55.6f, 51.3f, 47.4f, 255.0f});
 
     if(estado == 1){
@@ -188,28 +225,61 @@ void cambiarNivel(){
     pasosNivel = 0;
     llavesObtNivel = 0;
 
-    if(nivel == 3){ //Al acabar el nivel 3 se acaba el juego
+    if(nivel == 4){ //Al acabar el nivel 3 se acaba el juego
         return;
     }
 
     nivel++;
+
+    //Si hay un mapa cargado liberarlo
+    if(mapActual != NULL){
+        free(mapActual);
+    }
+
     if(nivel == 1){
-        mapActual = &mapa1[0][0];
+        mapActual = cargarMapa("mapa1.txt", MAP1_SIZE);
         mapSize = MAP1_SIZE;
         return;
     }else if(nivel == 2){
-        mapActual = &mapa2[0][0];
+        mapActual = cargarMapa("mapa2.txt", MAP2_SIZE);
         mapSize = MAP2_SIZE;
         return;
     }else if(nivel == 3){
-        mapActual = &mapa3[0][0];
+        mapActual = cargarMapa("mapa3.txt", MAP3_SIZE);
         mapSize = MAP3_SIZE;
+        return;
+    }else if(nivel == 4){
+        mapActual = cargarMapa("mapa4.txt", MAP4_SIZE);
+        mapSize = MAP4_SIZE;
         return;
     }else{
         //Error en el nivel y mapa
         TraceLog(LOG_WARNING, "Error en el número de nivel");
         return;
     }
+}
+
+//Cargar un mapa desde un archivo de texto externo
+char *cargarMapa(const char *nombreArchivo, int mapSize){
+    FILE *archivo = fopen(nombreArchivo, "r");
+
+    if(!archivo){
+        TraceLog(LOG_WARNING, "No se pudo abrir el archivo del mapa");
+        return NULL;
+    }
+
+    //Leer el archivo con el mapa
+    char *mapa = malloc(mapSize*mapSize);
+
+    char linea[200]; //El mapa no debera tener una linea mayor a 200 caracteres, en ese caso habra que modificar esto
+    for(int i=0; i<mapSize; i++){
+        fgets(linea, sizeof(linea), archivo);
+        for(int j=0; j<mapSize; j++){
+            mapa[i*mapSize + j] = linea[j];
+        }
+    }
+    fclose(archivo);
+    return mapa;
 }
 
 //Funciones de ensamblador
