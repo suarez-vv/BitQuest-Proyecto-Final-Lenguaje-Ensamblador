@@ -33,7 +33,7 @@ int estado = 1; //1=Jugando un nivel, 2=Pasando de nivel, 3=Fin del juego
 
 //Variables para al presionar la tecla de movimiento el personaje se siga moviendo
 float tiempoMovimiento = 0.0f;
-float retrasoMovimiento = 0.00f; //0.20
+float retrasoMovimiento = 0.20f;
 
 void iniciarJuego(){
     cambiarNivel();
