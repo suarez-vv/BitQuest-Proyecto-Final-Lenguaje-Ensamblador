@@ -6,6 +6,10 @@ BitQuest es una aventura de exploración basada en mapas donde el jugador debe r
 
 El proyecto combina programación de alto y bajo nivel mediante la integración de módulos desarrollados en C con rutinas implementadas en lenguaje ensamblador NASM x86-64. Esta integración permite utilizar ensamblador para operaciones relacionadas con el procesamiento de mapas, validación de movimientos, detección de objetos y cálculo de puntuaciones, mientras que C se encarga de la lógica general del juego y la interacción con la biblioteca gráfica Raylib.
 
+<div style="text-align: center;">
+<img src="screenshots/inicio.png" alt="inicio" width="50%">
+</div>
+
 ## Tecnologías Utilizadas
 
 - C
@@ -38,6 +42,10 @@ Durante la partida el jugador deberá:
 - Abrir puertas bloqueadas.
 - Encontrar la salida del nivel.
 - Completar todos los niveles disponibles.
+
+<div style="text-align: center;">
+<img src="screenshots/nivel_completado.png" alt="nivel_completado" width="50%">
+</div>
 
 ### Controles
 
@@ -77,6 +85,10 @@ El juego además incorpora:
 
 ```text
 BitQuest/
+│
+├── screenshots/
+│   ├── inicio.png
+│   └── nivel_completado.png
 │
 ├── assets/
 │   ├── audio/
